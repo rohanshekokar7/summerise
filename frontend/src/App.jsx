@@ -4,6 +4,10 @@ import Sidebar from './components/Sidebar.jsx'
 import ChatWindow from './components/ChatWindow.jsx'
 import SourcePanel from './components/SourcePanel.jsx'
 
+// In dev: empty string (Vite proxy handles /api → localhost:8000)
+// In production: set VITE_API_BASE_URL to your Render backend URL
+const API = import.meta.env.VITE_API_BASE_URL || ''
+
 let msgId = 0
 const uid = () => ++msgId
 
@@ -113,7 +117,7 @@ export default function App() {
       case 'done':
         if (streamingIdRef.current != null) finaliseStreaming(streamingIdRef.current, fu)
         setCurrentStep(4)
-        fetch('/api/report')
+        fetch(`${API}/api/report`)
           .then(r => r.ok ? r.json() : null)
           .then(data => {
             if (data) {
@@ -134,7 +138,7 @@ export default function App() {
 
   const streamRequest = useCallback(async (url, body) => {
     try {
-      const res = await fetch(url, {
+      const res = await fetch(`${API}${url}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -185,7 +189,7 @@ export default function App() {
   }, [addMsg, streamRequest])
 
   const downloadReport = useCallback(async () => {
-    const res = await fetch('/api/report/download')
+    const res = await fetch(`${API}/api/report/download`)
     if (!res.ok) return
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)

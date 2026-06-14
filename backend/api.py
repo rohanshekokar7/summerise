@@ -24,9 +24,14 @@ from research_assistant import ResearchAssistant
 
 app = FastAPI(title="AI Research Assistant API")
 
+_frontend_url = os.getenv("FRONTEND_URL", "")
+_allowed_origins = ["http://localhost:5173", "http://localhost:4173"]
+if _frontend_url:
+    _allowed_origins += [u.strip() for u in _frontend_url.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:4173"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
